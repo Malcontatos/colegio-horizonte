@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
     buildCommand: npm ci --include=dev && npm run build
-    startCommand: npm run db:deploy --workspace backend && npm run db:seed --workspace backend && npm start
+    startCommand: npm run db:deploy --workspace backend && node scripts/seed-if-needed.mjs && npm start
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:

@@ -4,6 +4,8 @@ Portal escolar completo com três áreas integradas: **Administração**, **Prof
 
 A identidade visual foi construída para o fictício **Colégio Horizonte**: azul-marinho, dourado e verde-água, com tipografia Sora + Inter.
 
+**Demo online:** [colegio-horizonte.onrender.com](https://colegio-horizonte.onrender.com) — React + Express no Render Free e PostgreSQL no Neon Free.
+
 ---
 
 ## Visão geral por perfil
@@ -248,7 +250,7 @@ Sem GitHub CLI: crie o repositório em [github.com](https://github.com), adicion
 1. Crie uma conta em [render.com](https://render.com) e conecte o GitHub.
 2. **New → Blueprint**, selecione o repositório. O Render lê o `render.yaml`.
 3. Informe `DATABASE_URL` com a string do Neon.
-4. Clique em **Apply**. O build roda `npm ci && npm run build`; o start aplica migrations, executa o seed idempotente e sobe API + SPA.
+4. Clique em **Apply**. O build roda `npm ci --include=dev && npm run build`; o start aplica migrations, executa o seed apenas se o banco estiver vazio e sobe API + SPA.
 5. A URL ficará no formato `https://colegio-horizonte.onrender.com` (ou o nome disponível).
 
 Também é possível criar manualmente um **Web Service** com:
@@ -257,7 +259,7 @@ Também é possível criar manualmente um **Web Service** com:
 | --- | --- |
 | Runtime | Node 22 |
 | Build | `npm ci --include=dev && npm run build` |
-| Start | `npm run db:deploy --workspace backend && npm run db:seed --workspace backend && npm start` |
+| Start | `npm run db:deploy --workspace backend && node scripts/seed-if-needed.mjs && npm start` |
 | Health check | `/api/health` |
 | Plano | Free |
 
