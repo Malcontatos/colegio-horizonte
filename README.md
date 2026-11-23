@@ -256,7 +256,7 @@ Também é possível criar manualmente um **Web Service** com:
 | Configuração | Valor |
 | --- | --- |
 | Runtime | Node 22 |
-| Build | `npm ci && npm run build` |
+| Build | `npm ci --include=dev && npm run build` |
 | Start | `npm run db:deploy --workspace backend && npm run db:seed --workspace backend && npm start` |
 | Health check | `/api/health` |
 | Plano | Free |
