@@ -1,0 +1,37 @@
+{
+  "name": "colegio-horizonte",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Portal escolar completo com áreas de administração, professor e aluno.",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n banco,api,web -c blue,green,magenta \"npm run dev:db\" \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:db": "node scripts/dev-db.mjs",
+    "dev:api": "npm run dev --workspace backend",
+    "dev:web": "npm run dev --workspace frontend",
+    "db:generate": "npm run db:generate --workspace backend",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:seed": "npm run db:seed --workspace backend",
+    "db:studio": "npm run db:studio --workspace backend",
+    "build": "npm run build --workspace backend && npm run build --workspace frontend",
+    "start": "npm run start --workspace backend",
+    "typecheck": "npm run typecheck --workspace backend && npm run typecheck --workspace frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7",
+    "embedded-postgres": "18.7.0-beta.19"
+  },
+  "allowScripts": {
+    "@embedded-postgres/windows-x64@18.7.0-beta.19": true,
+    "@prisma/engines@7.10.1": true,
+    "esbuild@0.28.2": true,
+    "prisma@7.10.1": true
+  }
+}

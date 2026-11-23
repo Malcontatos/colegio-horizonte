@@ -1,0 +1,186 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum Shift {
+  MORNING
+  AFTERNOON
+  EVENING
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  INACTIVE
+  TRANSFERRED
+}
+
+enum ResourceType {
+  MATERIAL
+  ACTIVITY
+  ASSESSMENT
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  student        Student?
+  teacher        Teacher?
+  libraryUploads LibraryResource[] @relation("ResourceUploader")
+}
+
+model Student {
+  id                 String   @id @default(uuid()) @db.Uuid
+  userId             String   @unique @db.Uuid
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  registrationNumber String   @unique
+  birthDate          DateTime? @db.Date
+  phone              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  enrollments Enrollment[]
+}
+
+model Teacher {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @unique @db.Uuid
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeNumber String   @unique
+  department     String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  assignments TeachingAssignment[]
+  grades      Grade[]              @relation("GradeTeacher")
+}
+
+model SchoolClass {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  year      Int
+  shift     Shift    @default(MORNING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enrollments Enrollment[]
+  assignments TeachingAssignment[]
+  resources   LibraryResource[]
+
+  @@unique([name, year])
+}
+
+model Subject {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  code      String   @unique
+  workload  Int      @default(80)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignments TeachingAssignment[]
+  grades      Grade[]
+  resources   LibraryResource[]
+}
+
+model TeachingAssignment {
+  id        String      @id @default(uuid()) @db.Uuid
+  teacherId String      @db.Uuid
+  teacher   Teacher     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  subjectId String      @db.Uuid
+  subject   Subject     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  classId   String      @db.Uuid
+  class     SchoolClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  createdAt DateTime    @default(now())
+
+  @@unique([teacherId, subjectId, classId])
+  @@index([classId])
+  @@index([subjectId])
+}
+
+model Enrollment {
+  id        String           @id @default(uuid()) @db.Uuid
+  studentId String           @db.Uuid
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classId   String           @db.Uuid
+  class     SchoolClass      @relation(fields: [classId], references: [id], onDelete: Restrict)
+  year      Int
+  status    EnrollmentStatus @default(ACTIVE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  grades Grade[]
+
+  @@unique([studentId, year])
+  @@index([classId])
+}
+
+model Grade {
+  id           String     @id @default(uuid()) @db.Uuid
+  enrollmentId String     @db.Uuid
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  subjectId    String     @db.Uuid
+  subject      Subject    @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  teacherId    String     @db.Uuid
+  teacher      Teacher    @relation("GradeTeacher", fields: [teacherId], references: [id], onDelete: Restrict)
+  period       Int
+  value        Decimal    @db.Decimal(4, 2)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([enrollmentId, subjectId, period])
+  @@index([subjectId])
+  @@index([teacherId])
+}
+
+model LibraryResource {
+  id            String       @id @default(uuid()) @db.Uuid
+  title         String
+  description   String?
+  type          ResourceType @default(MATERIAL)
+  subjectId     String       @db.Uuid
+  subject       Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  classId       String?      @db.Uuid
+  class         SchoolClass? @relation(fields: [classId], references: [id], onDelete: SetNull)
+  uploadedById  String       @db.Uuid
+  uploadedBy    User         @relation("ResourceUploader", fields: [uploadedById], references: [id], onDelete: Restrict)
+  fileName      String
+  storedName    String       @unique
+  mimeType      String
+  sizeBytes     Int
+  downloadCount Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  file LibraryFile?
+
+  @@index([subjectId, classId])
+  @@index([uploadedById])
+}
+
+model LibraryFile {
+  id         String          @id @default(uuid()) @db.Uuid
+  resourceId String          @unique @db.Uuid
+  resource   LibraryResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  content    Bytes
+  createdAt  DateTime        @default(now())
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.dev/
+.env
+.env.local
+!.env.example
+backend/src/generated/
+backend/uploads/*
+!backend/uploads/.gitkeep
+frontend/dist/
+*.log
+.DS_Store
+Thumbs.db
