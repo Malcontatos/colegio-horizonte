@@ -6,6 +6,8 @@ A identidade visual foi construída para o fictício **Colégio Horizonte**: azu
 
 **Demo online:** [colegio-horizonte.onrender.com](https://colegio-horizonte.onrender.com) — React + Express no Render Free e PostgreSQL no Neon Free.
 
+**Código-fonte:** [github.com/Malcontatos/colegio-horizonte](https://github.com/Malcontatos/colegio-horizonte)
+
 ---
 
 ## Visão geral por perfil
@@ -126,7 +128,9 @@ sistema-escolar/
 │     ├─ context/               # sessão do usuário
 │     ├─ lib/                   # API, formatadores, utilitários
 │     └─ pages/                 # admin, professor, aluno e login
-├─ scripts/dev-db.mjs           # PostgreSQL embarcado (Windows/Linux/macOS)
+├─ scripts/
+│  ├─ dev-db.mjs                # PostgreSQL embarcado (Windows/Linux/macOS)
+│  └─ seed-if-needed.mjs         # seed apenas quando o banco está vazio
 └─ render.yaml                  # blueprint de deploy gratuito no Render
 ```
 
